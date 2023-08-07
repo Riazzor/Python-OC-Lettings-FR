@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                     ],
                 ),
             ],
-            # Table already exists but was altered in oc_lettengs_site/migrations/0002_move_profile.py
+            # Table already exists but was altered in oc_lettings_site/migrations/0002_move_profile.py
             database_operations=[],
         )
     ]

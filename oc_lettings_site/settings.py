@@ -22,6 +22,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'oc_lettings_site',
+    'lettings',
     'profiles',
 
     'django.contrib.admin',
