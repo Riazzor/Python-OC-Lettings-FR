@@ -1,0 +1,24 @@
+[tool.flake8]
+max-line-length = 99
+exclude = "**/migrations/*,venv"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "oc_lettings_site.settings"
+python_files = "test_*.py"
+addopts = "-v"
+
+[tool.coverage.run]
+omit = [
+    "tests/*",
+    "*test*",
+    "manage.py",
+    "*init*",
+    "*sgi.py",
+    "admin.py",
+    "apps.py",
+    "settings.py",
+    "*/migrations/*",
+]
+
+[tool.coverage.path]
+source = ["./"]

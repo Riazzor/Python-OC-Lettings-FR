@@ -8,6 +8,7 @@ View Functions:
     letting(request, letting_id): Renders the details page for a specific letting.
 """
 from django.shortcuts import render
+from django.http import Http404
 from lettings.models import Letting
 
 
@@ -55,7 +56,11 @@ def letting(request, letting_id):
     Returns:
         HttpResponse: The rendered HTML for the letting details page.
     """
-    letting = Letting.objects.get(id=letting_id)
+    letting = Letting.objects.filter(id=letting_id)
+    if not letting.exists():
+        raise Http404()
+
+    letting = letting.first()
     context = {
         'title': letting.title,
         'address': letting.address,

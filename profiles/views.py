@@ -8,6 +8,7 @@ View Functions:
     profile(request, username): Renders the profile page for a specific user.
 """
 from django.shortcuts import render
+from django.http import Http404
 from profiles.models import Profile
 
 
@@ -50,6 +51,8 @@ def profile(request, username):
     Returns:
         HttpResponse: The rendered HTML for the profile page.
     """
-    profile = Profile.objects.get(user__username=username)
-    context = {'profile': profile}
+    profile = Profile.objects.filter(user__username=username)
+    if not profile.exists():
+        raise Http404()
+    context = {'profile': profile.first()}
     return render(request, 'profiles/profile.html', context)
