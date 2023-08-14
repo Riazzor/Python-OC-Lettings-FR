@@ -10,6 +10,10 @@ View Functions:
 from django.shortcuts import render
 from django.http import Http404
 from profiles.models import Profile
+from logger import get_logger
+
+
+logger = get_logger(__name__)
 
 
 # Sed placerat quam in pulvinar commodo. Nullam laoreet consectetur ex, sed consequat libero
@@ -53,6 +57,7 @@ def profile(request, username):
     """
     profile = Profile.objects.filter(user__username=username)
     if not profile.exists():
+        logger.warning(f'This profile does\'nt exists : {username}')
         raise Http404()
     context = {'profile': profile.first()}
     return render(request, 'profiles/profile.html', context)

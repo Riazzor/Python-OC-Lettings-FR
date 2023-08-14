@@ -10,6 +10,9 @@ View Functions:
 from django.shortcuts import render
 from django.http import Http404
 from lettings.models import Letting
+from logger import get_logger
+
+logger = get_logger(__name__)
 
 
 # Aenean leo magna, vestibulum et tincidunt fermentum, consectetur quis velit. Sed non placerat
@@ -58,6 +61,7 @@ def letting(request, letting_id):
     """
     letting = Letting.objects.filter(id=letting_id)
     if not letting.exists():
+        logger.warning(f'This letting object doesn\'t exists : {letting_id}')
         raise Http404()
 
     letting = letting.first()
