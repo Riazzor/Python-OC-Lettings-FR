@@ -1,0 +1,73 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: riazzor/oc_lettings:0.1
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Check linting
+          command: |
+            flake8
+      - run:
+          name: Python test and coverage
+          command: |
+            python3 -m pytest --cov . --cov-fail-under=80
+
+  build-and-push:
+    docker:
+      - image: docker:24.0.6-cli
+    resource_class: medium
+    steps:
+      - checkout
+      - setup_remote_docker:
+        # All docker related command will be executed locally on the VM used to spin up containers for your job.
+          version: 20.10.24
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t oc_lettings:$CIRCLE_SHA1 .
+      - run:
+          name: Give the commit hash as the tag to the docker image
+          command: |
+            docker tag oc_lettings:$CIRCLE_SHA1 riazzor/oc_lettings:$CIRCLE_SHA1
+      - run:
+          name: Give the latest keyword as the tag to the docker image
+          command: |
+            docker tag oc_lettings:$CIRCLE_SHA1 riazzor/oc_lettings:latest
+      - run:
+          name: Login to docker
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
+          name: Push both images to docker hub
+          command: |
+            docker push riazzor/oc_lettings:$CIRCLE_SHA1
+            docker push riazzor/oc_lettings:latest
+  deploy:
+    machine:
+      image: ubuntu-2204:2023.07.2
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: publish to render
+          command: |
+            curl $RENDER_DEPLOY_HOOK_URL
+
+workflows:
+  test-and-build:
+    jobs:
+      - test
+      - build-and-push:
+          requires:
+            - test
+      - deploy:
+          requires:
+            - test
+            - build-and-push
+          filters:
+            branches:
+              only: master

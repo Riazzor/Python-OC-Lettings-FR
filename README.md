@@ -1,3 +1,6 @@
+[![Riazzor](https://circleci.com/gh/Riazzor/Python-OC-Lettings-FR.svg?style=shield)](https://app.circleci.com/pipelines/github/Riazzor/Python-OC-Lettings-FR)
+
+
 ## Résumé
 
 Site web d'Orange County Lettings
@@ -78,3 +81,35 @@ Utilisation de PowerShell, comme ci-dessus sauf :
 
 - Pour activer l'environnement virtuel, `.\venv\Scripts\Activate.ps1` 
 - Remplacer `which <my-command>` par `(Get-Command <my-command>).Path`
+
+## Déploiement :
+
+### Image Docker :
+
+- Pour créer l'image une fois vos modification effectuée :  
+> docker build -t oc_lettings:<TAG> .  
+
+- Pour créer le tag de l'image :  
+> docker tag oc_lettings:<TAG> <REPO>/oc_lettings:<TAG>  
+
+- Pour se logger sur docker hub depuis le terminal : (définir les variables d'environnement au préalable)
+> echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+
+- Pour pousser manuellement l'image sur docker hub :  (condition : être logger sur docker hub depuis votre terminal)  
+> docker push <REPO>/oc_lettings:<TAG>
+
+- Lancer l'application en local avec docker :  
+> docker run --name oc_lettings -p 8000:8000 <REPO>/oc_lettings:<TAG>  
+Puis aller sur l'adresse : http://localhost:8000/
+
+
+### CI/CD :
+
+L'intégration continue fonctionne de la façon suivante :  
+- d'abord les tests sont lancés  
+- puis si pas de soucis, l'image docker est créer puis poussé sur docker hub,  
+- si la branche actuelle est master, l'application est déployé sur Render.
+
+Cette méthode permet un déploiement continue automatique.  
+Les différentes nouvelles features sont mergé à la branche develop, puis lorsque tout est mergé,
+la branche develop est mergé à la branche master pour activer le déploiement.
