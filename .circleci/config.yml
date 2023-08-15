@@ -1,0 +1,34 @@
+version: 2.1
+
+executors:
+  django-executor:
+    docker:
+      - image: python:3.8
+    working_directory: /app
+
+jobs:
+  build-and-test:
+    executor: django-executor
+    steps:
+      - checkout  # Check out the code into the working directory
+
+      - run:
+          name: Install dependencies
+          command: |
+            pip install -r requirements.txt
+
+      - run:
+          name: Run migrations
+          command: |
+            python manage.py migrate
+
+      - run:
+          name: Run tests
+          command: |
+            python manage.py test
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-and-test
