@@ -1,34 +1,15 @@
 version: 2.1
 
-executors:
-  django-executor:
-    docker:
-      - image: python:3.8
-    working_directory: /app
-
 jobs:
-  build-and-test:
-    executor: django-executor
+  test:
+    machine:  # linux environment
+      image: ubuntu-2204:2023.07.2
     steps:
-      - checkout  # Check out the code into the working directory
-
-      - run:
-          name: Install dependencies
-          command: |
-            pip install -r requirements.txt
-
-      - run:
-          name: Run migrations
-          command: |
-            python manage.py migrate
-
-      - run:
-          name: Run tests
-          command: |
-            python -m pytest
+      - checkout
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m pytest
 
 workflows:
-  version: 2
-  build:
+  test:
     jobs:
-      - build-and-test
+      - test
