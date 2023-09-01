@@ -78,3 +78,9 @@ Utilisation de PowerShell, comme ci-dessus sauf :
 
 - Pour activer l'environnement virtuel, `.\venv\Scripts\Activate.ps1` 
 - Remplacer `which <my-command>` par `(Get-Command <my-command>).Path`
+
+
+### Docker image :
+
+> docker build -t django-app:test .  
+> docker run --name django-app -p 8000:8000 django-app:test
