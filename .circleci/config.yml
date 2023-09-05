@@ -2,37 +2,23 @@ version: 2.1
 
 jobs:
   test:
-    machine:
-      image: ubuntu-2204:2023.07.2
+    docker:
+      - image: riazzor/oc_lettings:0.1
     steps:
       - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            python3 -m pip install -r requirements.txt
       - run:
           name: Python test
           command: |
             python3 -m pytest
   build:
     docker:
-      - image: cimg/python:3.11.5
+      - image: riazzor/oc_lettings:0.1
     resource_class: medium
     steps:
       - checkout
       - setup_remote_docker:
           version: 20.10.24
           # docker_layer_caching: true
-      - run: |
-          TAG=test
-          docker build -t CircleCI-docker/circleci-test
-          echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-      - run: |
-          docker push riazzor/circleci-test
-      - run:
-          name: Install dependencies
-          command: |
-            python3 -m pip install -r requirements.txt
       - run:
           name: Run migrations
           command: |
