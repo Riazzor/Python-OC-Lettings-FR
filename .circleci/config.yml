@@ -7,9 +7,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Python test
+          name: Check linting
           command: |
-            python3 -m pytest
+            flake8
+      - run:
+          name: Python test and coverage
+          command: |
+            python3 -m pytest --cov . --cov-fail-under=80
+
   build:
     docker:
       - image: riazzor/oc_lettings:0.1
@@ -18,16 +23,19 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 20.10.24
-          # docker_layer_caching: true
       - run:
           name: Run migrations
           command: |
             python manage.py migrate
 
       - run:
-          name: Run tests
+          name: Install docker
           command: |
-            python -m pytest
+            apt-get update && apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t oc_lettings:$TAG
 
 workflows:
   test-and-build:
