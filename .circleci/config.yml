@@ -4,6 +4,7 @@ jobs:
   test:
     docker:
       - image: riazzor/oc_lettings:0.1
+    resource_class: medium
     steps:
       - checkout
       - run:
@@ -15,39 +16,43 @@ jobs:
           command: |
             python3 -m pytest --cov . --cov-fail-under=80
 
-  build:
+  build-and-push:
     docker:
-      - image: riazzor/oc_lettings:0.1
+      - image: docker:24.0.6-cli
     resource_class: medium
     steps:
       - checkout
       - setup_remote_docker:
+        # All docker related command will be executed locally on the VM used to spin up containers for your job.
           version: 20.10.24
-      - run:
-          name: Run migrations
-          command: |
-            python manage.py migrate
-
-      - run:
-          name: Install docker
-          command: |
-            apt-get update && apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
       - run:
           name: Build docker image
           command: |
-            docker build -t oc_lettings:$TAG
+            docker build -t oc_lettings:$CIRCLE_SHA1 .
+      - run:
+          name: Give the tag to the docker image
+          command: |
+            docker tag oc_lettings:$CIRCLE_SHA1 riazzor/oc_lettings:$CIRCLE_SHA1
+      - run:
+          name: Login to docker
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
+          name: Push to docker hub
+          command: |
+            docker push riazzor/oc_lettings:$CIRCLE_SHA1
 
 workflows:
   test-and-build:
     jobs:
       - test
-      - build:
+      - build-and-push:
           requires:
             - test
       # - deploy:
       #     requires:
       #       - test
-      #       - build
+      #       - build-and-push
       #     filters:
       #       branches:
       #         only: master
