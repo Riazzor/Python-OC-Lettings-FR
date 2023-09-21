@@ -30,17 +30,32 @@ jobs:
           command: |
             docker build -t oc_lettings:$CIRCLE_SHA1 .
       - run:
-          name: Give the tag to the docker image
+          name: Give the commit hash as the tag to the docker image
           command: |
             docker tag oc_lettings:$CIRCLE_SHA1 riazzor/oc_lettings:$CIRCLE_SHA1
+      - run:
+          name: Give the latest keyword as the tag to the docker image
+          command: |
+            docker tag oc_lettings:$CIRCLE_SHA1 riazzor/oc_lettings:latest
       - run:
           name: Login to docker
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
       - run:
-          name: Push to docker hub
+          name: Push both images to docker hub
           command: |
             docker push riazzor/oc_lettings:$CIRCLE_SHA1
+            docker push riazzor/oc_lettings:latest
+  deploy:
+    machine:
+      image: ubuntu-2204:2023.07.2
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: publish to render
+          command: |
+            curl $RENDER_DEPLOY_HOOK_URL
 
 workflows:
   test-and-build:
@@ -49,10 +64,10 @@ workflows:
       - build-and-push:
           requires:
             - test
-      # - deploy:
-      #     requires:
-      #       - test
-      #       - build-and-push
-      #     filters:
-      #       branches:
-      #         only: master
+      - deploy:
+          requires:
+            - test
+            - build-and-push
+          filters:
+            branches:
+              only: master

@@ -6,16 +6,15 @@ WORKDIR /app
 
 RUN apt-get update
 RUN apt-get upgrade -y
+# Required for properly functioning with circleci (https://circleci.com/docs/custom-images/#required-tools-for-primary-containers)
 RUN apt-get install -y git
 RUN apt-get install -y openssh-server
 RUN apt-get install -y tar
 RUN apt-get install -y gzip
 RUN apt-get install -y ca-certificates
 
-COPY requirements.txt /app
-RUN pip install -r requirements.txt
-
 COPY . /app
+RUN pip install -r requirements.txt
 
 EXPOSE 8000
 
