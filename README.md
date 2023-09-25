@@ -1,7 +1,8 @@
 [![Riazzor](https://circleci.com/gh/Riazzor/Python-OC-Lettings-FR.svg?style=shield)](https://app.circleci.com/pipelines/github/Riazzor/Python-OC-Lettings-FR)
+[![Documentation Status](https://readthedocs.org/projects/python-orange-county-lettings/badge/?version=latest)](https://python-orange-county-lettings.readthedocs.io/fr/latest/?badge=latest)
 
 
-## Résumé
+## Résumé :
 
 Site web d'Orange County Lettings
 
